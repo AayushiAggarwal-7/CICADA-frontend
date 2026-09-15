@@ -139,3 +139,16 @@
 .footer-dot-sep {
   opacity: 0.4;
 }
+@media (max-width: 768px) {
+  .search-bar-top-row,
+  .ribbon-flex-wrapper,
+  .top-bar-flex-row,
+  .footer-flex-container,
+  .form-grid-two,
+  .profile-info-strip,
+  .profile-fields-grid {
+    flex-direction: column;
+    align-items: stretch;
+    grid-template-columns: 1fr;
+  }
+}
