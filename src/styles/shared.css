@@ -24,7 +24,7 @@
 
 .gov-main-navbar {
   background: #ffffff;
-  padding: 10px 0;
+  padding: 7px 0;
 }
 
 .nav-flex-wrapper {
@@ -41,13 +41,18 @@
   text-decoration: none;
 }
 
+.national-emblem-svg {
+  display: block;
+  flex-shrink: 0;
+}
+
 .brand-identity-text {
   display: flex;
   flex-direction: column;
 }
 
 .brand-primary-acronym {
-  font-size: 20px;
+  font-size: 30px;
   font-weight: 800;
   color: var(--color-navy-primary);
   letter-spacing: 1px;
@@ -55,7 +60,7 @@
 }
 
 .brand-authority-title {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--color-ochre-gold);
   letter-spacing: 1px;

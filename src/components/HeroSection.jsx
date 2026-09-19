@@ -1,7 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import secretariatHeroImg from '../assets/secretariat_hero.jpg'
-
+import secretariatHeroImg from '../assets/tiranga.png'
 /**
  * Hero Section (Exact Figma Page 1 Frame 1)
  * - Central Secretariat architectural background
@@ -17,7 +16,7 @@ export default function HeroSection({ onOpenLogin, onOpenRegister }) {
       id="hero-section"
       className="hero-architectural-section"
       style={{
-        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.45)), url(${secretariatHeroImg})`,
+        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0.36)), url(${secretariatHeroImg})`,
       }}
     >
       <div className="site-container hero-inner-container">
@@ -27,7 +26,7 @@ export default function HeroSection({ onOpenLogin, onOpenRegister }) {
           </h1>
 
           <p className="hero-sub-text">
-            A unified platform for secure, tamper-evident digital evidence workflow across agencies.
+            Secure, auditable digital evidence and case-document workflows across Police, Forensics, Prosecution, and Judiciary.
           </p>
 
           <div className="hero-cta-buttons-row">

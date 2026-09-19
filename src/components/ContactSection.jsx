@@ -11,22 +11,19 @@ export default function ContactSection() {
         <div className="section-header-block">
           <h2 className="section-heading-ochre">CONTACT US</h2>
           <p className="section-lead-paragraph">
-            For any issues, queries, or technical assistance with digital evidence management, please contact our official support desk:
+            For queries, feedback, or technical support regarding e-SAKSHYA, reach out to the project team:
           </p>
         </div>
 
         <div className="contact-details-list-block">
           <div className="contact-line-item">
-            <strong>Ministry of Home Affairs:</strong> Digital Evidence Division, North Block, Central Secretariat, New Delhi - 110001
+            <strong>Email:</strong> <a href="mailto:esakshya.co@gmail.com">esakshya.co@gmail.com</a>
           </div>
           <div className="contact-line-item">
-            <strong>Official Support:</strong> <a href="mailto:support.esakshya@gov.in">support.esakshya@gov.in</a> | <strong>Liaison:</strong> <a href="mailto:liaison.esakshya@gov.in">liaison.esakshya@gov.in</a>
+            <strong>Project:</strong> Smart India Hackathon 2026 — Team CICADA
           </div>
           <div className="contact-line-item">
-            <strong>National Toll-Free:</strong> 1800-11-3367 (24×7 Operational Desk)
-          </div>
-          <div className="contact-line-item">
-            <strong>Technical Support:</strong> Monday – Friday: 9:00 AM – 6:00 PM IST
+            <strong>Prototype note:</strong> This is a prototype developed for Smart India Hackathon. For production deployment, this section would be replaced with the responsible ministry's official support channels.
           </div>
         </div>
       </div>
