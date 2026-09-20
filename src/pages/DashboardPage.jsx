@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ProfileViewerModal from '../components/ProfileViewerModal'
 import FIRInbox from '../components/sho/FIRInbox'
+import MyCases from '../components/sho/MyCases'
 import SHODashboardHome from '../components/sho/SHODashboardHome'
 import SHOSidebar from '../components/sho/SHOSidebar'
 import SHOTopbar from '../components/sho/SHOTopbar'
@@ -57,6 +58,8 @@ export default function DashboardPage() {
             <SHODashboardHome currentUser={currentUser} onNavigate={setActiveSection} />
           ) : activeSection === 'fir-inbox' ? (
             <FIRInbox currentUser={currentUser} onBack={() => setActiveSection('dashboard')} />
+          ) : activeSection === 'my-cases' ? (
+            <MyCases currentUser={currentUser} onBack={() => setActiveSection('dashboard')} />
           ) : (
             <section className="sho-placeholder-panel" aria-labelledby="coming-next-title">
               <span className="sho-placeholder-mark" aria-hidden="true">DEMS</span>
