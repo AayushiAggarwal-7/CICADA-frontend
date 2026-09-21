@@ -9,6 +9,15 @@ import SHOSidebar from '../components/sho/SHOSidebar'
 import SHOTopbar from '../components/sho/SHOTopbar'
 import '../styles/sho-dashboard.css'
 
+const initialCaseTeams = {
+  'FIR-2026-089': [
+    { officerId: 'sho', designation: 'Inspector (SHO)', assignmentRole: 'Primary Investigating Officer' },
+  ],
+  'FIR-2026-074': [
+    { officerId: 'sho', designation: 'Inspector (SHO)', assignmentRole: 'Primary Investigating Officer' },
+  ],
+}
+
 export default function DashboardPage() {
   const navigate = useNavigate()
   const [currentUser, setCurrentUser] = useState(() => {
@@ -33,7 +42,32 @@ export default function DashboardPage() {
   })
 
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
+  const [caseTeams, setCaseTeams] = useState(initialCaseTeams)
   const { pathname } = useLocation()
+
+  const markFirReviewed = (caseId) => {
+    setCaseTeams((previous) => (
+      Object.prototype.hasOwnProperty.call(previous, caseId)
+        ? previous
+        : { ...previous, [caseId]: [] }
+    ))
+  }
+
+  const addTeamMember = (caseId, member) => {
+    setCaseTeams((previous) => {
+      const currentTeam = previous[caseId] || []
+      if (currentTeam.some((teamMember) => teamMember.officerId === member.officerId)) return previous
+      if (member.assignmentRole === 'Primary Investigating Officer' && currentTeam.some((teamMember) => teamMember.assignmentRole === 'Primary Investigating Officer')) return previous
+      return { ...previous, [caseId]: [...currentTeam, member] }
+    })
+  }
+
+  const removeTeamMember = (caseId, officerId) => {
+    setCaseTeams((previous) => ({
+      ...previous,
+      [caseId]: (previous[caseId] || []).filter((teamMember) => teamMember.officerId !== officerId),
+    }))
+  }
 
   const navigateToSection = (section) => {
     const sectionPaths = {
@@ -67,11 +101,11 @@ export default function DashboardPage() {
           {pathname === '/dashboard' ? (
             <SHODashboardHome currentUser={currentUser} onNavigate={navigateToSection} />
           ) : pathname === '/dashboard/fir-inbox' ? (
-            <FIRInbox currentUser={currentUser} onBack={() => navigate('/dashboard')} />
+            <FIRInbox currentUser={currentUser} caseTeams={caseTeams} onMarkReviewed={markFirReviewed} onAddOfficer={addTeamMember} onRemoveOfficer={removeTeamMember} onBack={() => navigate('/dashboard')} />
           ) : pathname === '/dashboard/my-cases' ? (
             <MyCases currentUser={currentUser} />
           ) : pathname.startsWith('/dashboard/my-cases/') ? (
-            <CaseWorkspace currentUser={currentUser} />
+            <CaseWorkspace currentUser={currentUser} caseTeams={caseTeams} />
           ) : (
             <section className="sho-placeholder-panel" aria-labelledby="coming-next-title">
               <span className="sho-placeholder-mark" aria-hidden="true">DEMS</span>

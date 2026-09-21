@@ -7,7 +7,7 @@ const assignmentRoles = [
 	'Field / Witness Support',
 ]
 
-export default function FIRDetail({ fir, officerOptions, onAddOfficer, onRemoveOfficer, onBack, onClose }) {
+export default function FIRDetail({ fir, team, officerOptions, onAddOfficer, onRemoveOfficer, onBack, onClose }) {
 	const [officerId, setOfficerId] = useState('')
 	const [assignmentRole, setAssignmentRole] = useState(assignmentRoles[0])
 	const [isAddingOfficer, setIsAddingOfficer] = useState(false)
@@ -19,9 +19,9 @@ export default function FIRDetail({ fir, officerOptions, onAddOfficer, onRemoveO
 	}, [fir.id])
 
 	const selectedOfficer = officerOptions.find((officer) => officer.id === officerId)
-	const existingPrimary = fir.team.find((teamMember) => teamMember.assignmentRole === 'Primary Investigating Officer')
-	const assignedOfficerNames = new Set(fir.team.map((teamMember) => teamMember.officer))
-	const availableOfficers = officerOptions.filter((officer) => !assignedOfficerNames.has(officer.name))
+	const existingPrimary = team.find((teamMember) => teamMember.assignmentRole === 'Primary Investigating Officer')
+	const assignedOfficerIds = new Set(team.map((teamMember) => teamMember.officerId))
+	const availableOfficers = officerOptions.filter((officer) => !assignedOfficerIds.has(officer.id))
 	const canAddPrimary = !existingPrimary
 
 	const handleSubmit = (event) => {
@@ -29,7 +29,7 @@ export default function FIRDetail({ fir, officerOptions, onAddOfficer, onRemoveO
 		if (!selectedOfficer) return
 		if (assignmentRole === 'Primary Investigating Officer' && !canAddPrimary) return
 		onAddOfficer(fir.id, {
-			officer: selectedOfficer.name,
+			officerId: selectedOfficer.id,
 			designation: selectedOfficer.designation,
 			assignmentRole,
 		})
@@ -55,13 +55,13 @@ export default function FIRDetail({ fir, officerOptions, onAddOfficer, onRemoveO
 				</section>
 
 				<section className="sho-detail-panel sho-assignment-panel" aria-labelledby="assignment-title">
-					<div className="sho-detail-panel-heading"><div><p className="sho-eyebrow">Station command</p><h2 id="assignment-title">Investigation Team</h2><span className="sho-team-count">{fir.team.length} officer{fir.team.length === 1 ? '' : 's'}</span></div><button type="button" className="sho-add-officer-button" onClick={() => setIsAddingOfficer(true)} disabled={isAddingOfficer || availableOfficers.length === 0}>+ Add Officer</button></div>
-					{fir.team.length > 0 ? (
+					<div className="sho-detail-panel-heading"><div><p className="sho-eyebrow">Station command</p><h2 id="assignment-title">Investigation Team</h2><span className="sho-team-count">{team.length} officer{team.length === 1 ? '' : 's'}</span></div><button type="button" className="sho-add-officer-button" onClick={() => setIsAddingOfficer(true)} disabled={isAddingOfficer || availableOfficers.length === 0}>+ Add Officer</button></div>
+					{team.length > 0 ? (
 						<div className="sho-team-list">
-							{fir.team.map((teamMember) => (
-								<div className="sho-team-member" key={teamMember.officer}>
-									<div className="sho-team-member-copy"><span className="sho-team-role">{teamMember.assignmentRole}</span><strong>{teamMember.officer}</strong><small>{teamMember.designation}</small></div>
-									<button type="button" className="sho-remove-officer" onClick={() => onRemoveOfficer(fir.id, teamMember.officer)}>Remove</button>
+							{team.map((teamMember) => (
+								<div className="sho-team-member" key={teamMember.officerId}>
+									<div className="sho-team-member-copy"><span className="sho-team-role">{teamMember.assignmentRole}</span><strong>{officerOptions.find((officer) => officer.id === teamMember.officerId)?.name || teamMember.officerId}</strong><small>{teamMember.designation}</small></div>
+									<button type="button" className="sho-remove-officer" onClick={() => onRemoveOfficer(fir.id, teamMember.officerId)}>Remove</button>
 								</div>
 							))}
 						</div>

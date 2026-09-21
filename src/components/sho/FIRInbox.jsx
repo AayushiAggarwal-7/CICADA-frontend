@@ -32,22 +32,21 @@ function matchesSearch(record, query) {
 	return searchableFields.some((field) => field?.toLowerCase().includes(query))
 }
 
-export default function FIRInbox({ currentUser, onBack }) {
+export default function FIRInbox({ currentUser, caseTeams, onMarkReviewed, onAddOfficer, onRemoveOfficer, onBack }) {
 	const [searchQuery, setSearchQuery] = useState('')
 	const [activeFilter, setActiveFilter] = useState('All')
 	const [selectedFirId, setSelectedFirId] = useState(null)
-	const [teams, setTeams] = useState({})
-	const [hasBeenReviewed, setHasBeenReviewed] = useState({})
 
 	const records = useMemo(() => initialInboxRecords.map((record) => {
-		const team = teams[record.id] || record.team
-		const reviewed = hasBeenReviewed[record.id] || record.team.length > 0
+		const isReviewed = Object.prototype.hasOwnProperty.call(caseTeams, record.id)
+		const team = isReviewed ? caseTeams[record.id] : record.team
+		const reviewed = isReviewed || record.team.length > 0
 		const inboxStatus = !reviewed && team.length === 0
 			? 'Unassigned'
 			: team.length === 0 ? 'Under Review' : 'Assigned'
 
 		return { ...record, team, inboxStatus }
-	}), [hasBeenReviewed, teams])
+	}), [caseTeams])
 
 	const filteredRecords = records.filter((record) => {
 		const matchesFilter = activeFilter === 'All' || record.inboxStatus === activeFilter
@@ -56,24 +55,8 @@ export default function FIRInbox({ currentUser, onBack }) {
 	})
 	const selectedFir = records.find((record) => record.id === selectedFirId) || null
 
-	const handleAddOfficer = (firId, member) => {
-		setTeams((previous) => {
-			const currentTeam = previous[firId] || records.find((record) => record.id === firId)?.team || []
-			if (currentTeam.some((teamMember) => teamMember.officer === member.officer)) return previous
-			return { ...previous, [firId]: [...currentTeam, member] }
-		})
-		setHasBeenReviewed((previous) => ({ ...previous, [firId]: true }))
-	}
-
-	const handleRemoveOfficer = (firId, officerName) => {
-		setTeams((previous) => {
-			const currentTeam = previous[firId] || records.find((record) => record.id === firId)?.team || []
-			return { ...previous, [firId]: currentTeam.filter((teamMember) => teamMember.officer !== officerName) }
-		})
-	}
-
 	const handleOpenFir = (firId) => {
-		setHasBeenReviewed((previous) => ({ ...previous, [firId]: true }))
+		onMarkReviewed(firId)
 		setSelectedFirId(firId)
 	}
 
@@ -81,10 +64,11 @@ export default function FIRInbox({ currentUser, onBack }) {
 		return (
 			<FIRDetail
 				fir={selectedFir}
+				team={selectedFir.team}
 				currentUser={currentUser}
 				officerOptions={officerOptions}
-				onAddOfficer={handleAddOfficer}
-				onRemoveOfficer={handleRemoveOfficer}
+				onAddOfficer={onAddOfficer}
+				onRemoveOfficer={onRemoveOfficer}
 				onBack={() => setSelectedFirId(null)}
 				onClose={() => setSelectedFirId(null)}
 			/>

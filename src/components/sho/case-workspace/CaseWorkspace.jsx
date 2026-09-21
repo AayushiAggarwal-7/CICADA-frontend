@@ -31,10 +31,11 @@ function getAssignedCases(currentUser) {
 	}))
 }
 
-export default function CaseWorkspace({ currentUser }) {
+export default function CaseWorkspace({ currentUser, caseTeams }) {
 	const { caseId } = useParams()
 	const navigate = useNavigate()
 	const caseItem = getAssignedCases(currentUser).find((item) => item.id === caseId)
+	const team = caseTeams?.[caseId] || []
 	const [activeTab, setActiveTab] = useState('overview')
 
 	if (!caseItem) {
@@ -62,7 +63,7 @@ export default function CaseWorkspace({ currentUser }) {
 				{tabs.map((tab) => <button type="button" key={tab.id} className={activeTab === tab.id ? 'is-active' : ''} onClick={() => setActiveTab(tab.id)}>{tab.label}</button>)}
 			</nav>
 			<div className="sho-case-workspace-content">
-				{activeTab === 'overview' ? <CaseOverview caseItem={caseItem} /> : <TabContent caseItem={caseItem} />}
+				{activeTab === 'overview' ? <CaseOverview caseItem={caseItem} /> : <TabContent caseItem={caseItem} team={team} />}
 			</div>
 		</section>
 	)
