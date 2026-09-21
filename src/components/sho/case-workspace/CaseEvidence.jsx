@@ -7,6 +7,7 @@ const prototypeEvidence = {
 		{
 			id: 'EVD-089-001', caseId: 'FIR-2026-089', type: 'Mobile Phone', description: 'Android smartphone seized from accused',
 			custodian: 'HC Dilbagh Singh', location: 'CFSL Digital Forensics', status: 'With FSL',
+			media: { fileName: 'mobile_device_record_01.jpg', type: 'image', uploadedDate: '30-Aug-2026' },
 			custodyHistory: [
 				{ date: '28-Aug-2026 14:20', action: 'Evidence seized', officer: 'SI Vikramaditya Singh', location: 'Crime Scene' },
 				{ date: '28-Aug-2026 17:10', action: 'Deposited in Malkhana', officer: 'HC Dilbagh Singh', location: 'Central PS Malkhana' },
@@ -16,6 +17,7 @@ const prototypeEvidence = {
 		{
 			id: 'EVD-089-002', caseId: 'FIR-2026-089', type: 'CCTV DVR', description: 'Basement parking surveillance recorder',
 			custodian: 'SI Vikramaditya Singh', location: 'Central PS Malkhana', status: 'In Custody',
+			media: null,
 			custodyHistory: [
 				{ date: '28-Aug-2026 13:45', action: 'Evidence seized', officer: 'SI Vikramaditya Singh', location: 'Sector 4 Commercial Complex' },
 				{ date: '28-Aug-2026 17:30', action: 'Deposited in Malkhana', officer: 'HC Dilbagh Singh', location: 'Central PS Malkhana' },
@@ -24,6 +26,7 @@ const prototypeEvidence = {
 		{
 			id: 'EVD-089-003', caseId: 'FIR-2026-089', type: 'Questioned Document', description: 'Handwritten access register recovered from security desk',
 			custodian: 'Inspector Rajesh Kumar Sharma', location: 'Central PS Malkhana', status: 'In Custody',
+			media: null,
 			custodyHistory: [
 				{ date: '29-Aug-2026 10:15', action: 'Evidence seized', officer: 'Inspector Rajesh Kumar Sharma', location: 'Security Office, Sector 4' },
 				{ date: '29-Aug-2026 12:40', action: 'Sealed and deposited', officer: 'HC Dilbagh Singh', location: 'Central PS Malkhana' },
@@ -34,6 +37,7 @@ const prototypeEvidence = {
 		{
 			id: 'EVD-074-001', caseId: 'FIR-2026-074', type: 'Laptop', description: 'Office laptop collected for financial records review',
 			custodian: 'Inspector Rajesh Kumar Sharma', location: 'Central PS Malkhana', status: 'In Custody',
+			media: null,
 			custodyHistory: [
 				{ date: '15-Aug-2026 11:00', action: 'Evidence seized', officer: 'Inspector Rajesh Kumar Sharma', location: 'Metro Infotech Office' },
 				{ date: '15-Aug-2026 14:20', action: 'Deposited in Malkhana', officer: 'HC Dilbagh Singh', location: 'Central PS Malkhana' },
@@ -42,6 +46,7 @@ const prototypeEvidence = {
 		{
 			id: 'EVD-074-002', caseId: 'FIR-2026-074', type: 'Seized Property', description: 'Original bank guarantee files and transaction registers',
 			custodian: 'SI Vikramaditya Singh', location: 'Central PS Malkhana', status: 'Returned',
+			media: { fileName: 'seized_registers_01.jpg', type: 'image', uploadedDate: '16-Aug-2026' },
 			custodyHistory: [
 				{ date: '16-Aug-2026 09:40', action: 'Evidence seized', officer: 'SI Vikramaditya Singh', location: 'State Bank Audit Office' },
 				{ date: '22-Aug-2026 16:00', action: 'Returned under receipt', officer: 'Inspector Rajesh Kumar Sharma', location: 'State Bank Audit Office' },
@@ -59,6 +64,7 @@ export default function CaseEvidence({ caseItem }) {
 	const [searchQuery, setSearchQuery] = useState('')
 	const [activeFilter, setActiveFilter] = useState('All')
 	const [selectedEvidence, setSelectedEvidence] = useState(null)
+	const [mediaMessage, setMediaMessage] = useState('')
 	const evidence = prototypeEvidence[caseItem.id] || []
 	const filteredEvidence = useMemo(() => {
 		const query = searchQuery.trim().toLowerCase()
@@ -104,6 +110,11 @@ export default function CaseEvidence({ caseItem }) {
 			{selectedEvidence && <aside className="sho-evidence-detail" aria-labelledby="evidence-detail-title">
 				<div className="sho-evidence-detail-heading"><div><p className="sho-eyebrow">Exhibit record</p><h3 id="evidence-detail-title">{selectedEvidence.id}</h3></div><button type="button" className="sho-detail-close" aria-label="Close evidence details" onClick={() => setSelectedEvidence(null)}>×</button></div>
 				<dl className="sho-evidence-detail-fields"><div><dt>Evidence ID</dt><dd>{selectedEvidence.id}</dd></div><div><dt>Type</dt><dd>{selectedEvidence.type}</dd></div><div className="sho-evidence-detail-wide"><dt>Description</dt><dd>{selectedEvidence.description}</dd></div><div><dt>Current custodian</dt><dd>{selectedEvidence.custodian}</dd></div><div><dt>Current location</dt><dd>{selectedEvidence.location}</dd></div><div><dt>Current status</dt><dd><StatusBadge status={selectedEvidence.status} /></dd></div></dl>
+				<section className="sho-evidence-media" aria-labelledby="evidence-media-title">
+					<div className="sho-evidence-detail-heading"><div><p className="sho-eyebrow">Attachment area</p><h3 id="evidence-media-title">Evidence Media</h3></div><button type="button" className="sho-secondary-button" disabled>Upload Media</button></div>
+					{selectedEvidence.media ? <div className="sho-evidence-media-record"><div className="sho-evidence-media-placeholder" aria-hidden="true">{selectedEvidence.media.type.toUpperCase()}</div><div className="sho-evidence-media-copy"><strong>{selectedEvidence.media.fileName}</strong><span>Type: {selectedEvidence.media.type}</span><span>Uploaded: {selectedEvidence.media.uploadedDate}</span></div><div className="sho-evidence-media-actions"><button type="button" className="sho-review-button" onClick={() => setMediaMessage('Media preview will be enabled after backend integration.')}>View</button><button type="button" className="sho-document-download" onClick={() => setMediaMessage('Download will be enabled after backend integration.')}>Download</button></div></div> : <div className="sho-evidence-media-empty"><strong>No evidence photo or media uploaded</strong><span>Media will appear here after backend integration.</span></div>}
+					{mediaMessage && <p className="sho-evidence-media-message" role="status">{mediaMessage}<button type="button" onClick={() => setMediaMessage('')}>Dismiss</button></p>}
+				</section>
 				<div className="sho-custody-history"><div className="sho-evidence-detail-heading"><div><p className="sho-eyebrow">Traceability</p><h3>Custody History</h3></div><span className="sho-evidence-history-note">Prototype record</span></div><ol>{selectedEvidence.custodyHistory.map((event) => <li key={`${event.date}-${event.action}`}><time>{event.date}</time><strong>{event.action}</strong><span>{event.officer}</span><small>{event.location}</small></li>)}</ol></div>
 			</aside>}
 		</section>
