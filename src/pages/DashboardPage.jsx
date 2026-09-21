@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import ProfileViewerModal from '../components/ProfileViewerModal'
 import FIRInbox from '../components/sho/FIRInbox'
 import MyCases from '../components/sho/MyCases'
+import CaseWorkspace from '../components/sho/case-workspace/CaseWorkspace'
 import SHODashboardHome from '../components/sho/SHODashboardHome'
 import SHOSidebar from '../components/sho/SHOSidebar'
 import SHOTopbar from '../components/sho/SHOTopbar'
@@ -32,7 +33,18 @@ export default function DashboardPage() {
   })
 
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
-  const [activeSection, setActiveSection] = useState('dashboard')
+  const { pathname } = useLocation()
+
+  const navigateToSection = (section) => {
+    const sectionPaths = {
+      dashboard: '/dashboard',
+      'fir-inbox': '/dashboard/fir-inbox',
+      'my-cases': '/dashboard/my-cases',
+      'station-cases': '/dashboard/station-cases',
+      search: '/dashboard/search',
+    }
+    navigate(sectionPaths[section] || '/dashboard')
+  }
 
   const handleLogout = () => {
     localStorage.removeItem('dems_active_user')
@@ -49,17 +61,17 @@ export default function DashboardPage() {
       <div className="sho-dashboard-body">
         <SHOSidebar
           currentUser={currentUser}
-          activeSection={activeSection}
-          onSectionChange={setActiveSection}
           onOpenProfile={() => setIsProfileModalOpen(true)}
         />
         <main className="sho-dashboard-content">
-          {activeSection === 'dashboard' ? (
-            <SHODashboardHome currentUser={currentUser} onNavigate={setActiveSection} />
-          ) : activeSection === 'fir-inbox' ? (
-            <FIRInbox currentUser={currentUser} onBack={() => setActiveSection('dashboard')} />
-          ) : activeSection === 'my-cases' ? (
-            <MyCases currentUser={currentUser} onBack={() => setActiveSection('dashboard')} />
+          {pathname === '/dashboard' ? (
+            <SHODashboardHome currentUser={currentUser} onNavigate={navigateToSection} />
+          ) : pathname === '/dashboard/fir-inbox' ? (
+            <FIRInbox currentUser={currentUser} onBack={() => navigate('/dashboard')} />
+          ) : pathname === '/dashboard/my-cases' ? (
+            <MyCases currentUser={currentUser} />
+          ) : pathname.startsWith('/dashboard/my-cases/') ? (
+            <CaseWorkspace currentUser={currentUser} />
           ) : (
             <section className="sho-placeholder-panel" aria-labelledby="coming-next-title">
               <span className="sho-placeholder-mark" aria-hidden="true">DEMS</span>

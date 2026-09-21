@@ -1,4 +1,5 @@
 import React from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const navigationItems = [
 	{ id: 'dashboard', label: 'Dashboard', icon: '▦' },
@@ -8,7 +9,25 @@ const navigationItems = [
 	{ id: 'search', label: 'Search', icon: '⌕' },
 ]
 
-export default function SHOSidebar({ currentUser, activeSection, onSectionChange, onOpenProfile }) {
+export default function SHOSidebar({ currentUser, onOpenProfile }) {
+	const navigate = useNavigate()
+	const { pathname } = useLocation()
+	const activeSection = pathname === '/dashboard'
+		? 'dashboard'
+		: pathname.startsWith('/dashboard/fir-inbox')
+			? 'fir-inbox'
+			: pathname.startsWith('/dashboard/my-cases')
+				? 'my-cases'
+				: pathname.startsWith('/dashboard/station-cases')
+					? 'station-cases'
+					: pathname.startsWith('/dashboard/search') ? 'search' : 'dashboard'
+	const sectionPaths = {
+		dashboard: '/dashboard',
+		'fir-inbox': '/dashboard/fir-inbox',
+		'my-cases': '/dashboard/my-cases',
+		'station-cases': '/dashboard/station-cases',
+		search: '/dashboard/search',
+	}
 	const initials = (currentUser?.name || 'Officer')
 		.split(' ')
 		.slice(0, 2)
@@ -32,7 +51,7 @@ export default function SHOSidebar({ currentUser, activeSection, onSectionChange
 						type="button"
 						key={item.id}
 						className={`sho-nav-item ${activeSection === item.id ? 'is-active' : ''}`}
-						onClick={() => onSectionChange(item.id)}
+						onClick={() => navigate(sectionPaths[item.id])}
 						aria-current={activeSection === item.id ? 'page' : undefined}
 					>
 						<span className="sho-nav-icon" aria-hidden="true">{item.icon}</span>

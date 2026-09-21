@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { policeRoles } from '../../data/policeData'
-import CaseWorkspace from './case-workspace/CaseWorkspace'
 
 const progressFilters = ['All', 'Active', 'Under Investigation', 'In Court', 'Closed', 'Archived']
 
@@ -49,10 +49,10 @@ function CaseListItem({ caseItem, onOpen }) {
 	)
 }
 
-export default function MyCases({ currentUser, onBack }) {
+export default function MyCases({ currentUser }) {
+	const navigate = useNavigate()
 	const [searchQuery, setSearchQuery] = useState('')
 	const [activeFilter, setActiveFilter] = useState('All')
-	const [selectedCase, setSelectedCase] = useState(null)
 	const policeRole = getPoliceRole(currentUser)
 	const cases = (policeRole?.ownCases || []).map((caseItem) => ({
 		...caseItem,
@@ -66,10 +66,6 @@ export default function MyCases({ currentUser, onBack }) {
 			&& (!query || matchesSearch(caseItem, query))
 		))
 	}, [activeFilter, cases, searchQuery])
-
-	if (selectedCase) {
-		return <CaseWorkspace caseItem={selectedCase} currentUser={currentUser} onBack={() => setSelectedCase(null)} />
-	}
 
 	return (
 		<section className="sho-workspace-view sho-my-cases" aria-labelledby="my-cases-title">
@@ -90,7 +86,7 @@ export default function MyCases({ currentUser, onBack }) {
 			</div>
 
 			<div className="sho-my-case-list">
-				{filteredCases.map((caseItem) => <CaseListItem key={caseItem.id} caseItem={caseItem} onOpen={setSelectedCase} />)}
+				{filteredCases.map((caseItem) => <CaseListItem key={caseItem.id} caseItem={caseItem} onOpen={(selectedCase) => navigate(`/dashboard/my-cases/${selectedCase.id}`)} />)}
 				{filteredCases.length === 0 && <div className="sho-empty-state sho-my-cases-empty">No cases match the current search and progress filter.</div>}
 			</div>
 		</section>
