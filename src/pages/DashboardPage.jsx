@@ -2,11 +2,13 @@ import React, { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import ProfileViewerModal from '../components/ProfileViewerModal'
 import FIRInbox from '../components/sho/FIRInbox'
+import GlobalSearch from '../components/sho/GlobalSearch'
 import MyCases, { getAssignmentDrivenCases } from '../components/sho/MyCases'
 import CaseWorkspace from '../components/sho/case-workspace/CaseWorkspace'
 import SHODashboardHome from '../components/sho/SHODashboardHome'
 import SHOSidebar from '../components/sho/SHOSidebar'
 import SHOTopbar from '../components/sho/SHOTopbar'
+import StationCases, { getStationCases } from '../components/sho/StationCases'
 import '../styles/sho-dashboard.css'
 
 const initialCaseTeams = {
@@ -45,6 +47,8 @@ export default function DashboardPage() {
   const [caseTeams, setCaseTeams] = useState(initialCaseTeams)
   const { pathname } = useLocation()
   const assignedCases = getAssignmentDrivenCases(currentUser, caseTeams)
+  const stationCases = getStationCases()
+  const workspaceCases = [...assignedCases, ...stationCases.filter((stationCase) => !assignedCases.some((assignedCase) => assignedCase.id === stationCase.id))]
 
   const markFirReviewed = (caseId) => {
     setCaseTeams((previous) => (
@@ -103,10 +107,14 @@ export default function DashboardPage() {
             <SHODashboardHome currentUser={currentUser} myCases={assignedCases} onNavigate={navigateToSection} />
           ) : pathname === '/dashboard/fir-inbox' ? (
             <FIRInbox currentUser={currentUser} caseTeams={caseTeams} onMarkReviewed={markFirReviewed} onAddOfficer={addTeamMember} onRemoveOfficer={removeTeamMember} onBack={() => navigate('/dashboard')} />
+          ) : pathname === '/dashboard/search' ? (
+            <GlobalSearch currentUser={currentUser} caseTeams={caseTeams} />
           ) : pathname === '/dashboard/my-cases' ? (
             <MyCases currentUser={currentUser} caseTeams={caseTeams} />
+          ) : pathname === '/dashboard/station-cases' ? (
+            <StationCases caseTeams={caseTeams} />
           ) : pathname.startsWith('/dashboard/my-cases/') ? (
-          <CaseWorkspace currentUser={currentUser} caseTeams={caseTeams} myCases={assignedCases} />
+          <CaseWorkspace currentUser={currentUser} caseTeams={caseTeams} myCases={workspaceCases} />
           ) : (
             <section className="sho-placeholder-panel" aria-labelledby="coming-next-title">
               <span className="sho-placeholder-mark" aria-hidden="true">DEMS</span>
