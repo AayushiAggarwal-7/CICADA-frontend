@@ -1,13 +1,26 @@
 import React, { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { masterCaseDatabase } from '../../data/demsData'
 import { policeRoles } from '../../data/policeData'
 
 const progressFilters = ['All', 'Active', 'Under Investigation', 'In Court', 'Closed', 'Archived']
 
 function getPoliceRole(currentUser) {
-	if (currentUser?.roleId === 'police_sho') return policeRoles.find((role) => role.id === 'sho')
 	const roleId = currentUser?.roleId?.replace(/^police_/, '')
 	return policeRoles.find((role) => role.id === roleId) || policeRoles.find((role) => role.id === 'sho')
+}
+
+export function getCurrentOfficerId(currentUser) {
+	return currentUser?.officerId || currentUser?.roleId?.replace(/^police_/, '') || getPoliceRole(currentUser)?.id
+}
+
+function getCaseMetadata() {
+	const metadata = new Map()
+	masterCaseDatabase.filter((caseItem) => caseItem.orgType === 'police').forEach((caseItem) => metadata.set(caseItem.id, caseItem))
+	policeRoles.forEach((role) => role.ownCases?.forEach((caseItem) => {
+		if (!metadata.has(caseItem.id)) metadata.set(caseItem.id, caseItem)
+	}))
+	return metadata
 }
 
 function matchesSearch(caseItem, query) {
@@ -27,6 +40,23 @@ function getPriority(caseItem) {
 	if (caseItem.statusLevel === 'critical') return 'Critical'
 	if (caseItem.statusLevel === 'urgent') return 'Urgent'
 	return 'Routine'
+}
+
+export function getAssignmentDrivenCases(currentUser, caseTeams = {}) {
+	const officerId = getCurrentOfficerId(currentUser)
+	const caseMetadata = getCaseMetadata()
+	const assignedCaseIds = Object.entries(caseTeams)
+		.filter(([, team]) => team.some((member) => member.officerId === officerId))
+		.map(([caseId]) => caseId)
+
+	return assignedCaseIds
+		.map((caseId) => caseMetadata.get(caseId))
+		.filter(Boolean)
+		.map((caseItem) => ({
+			...caseItem,
+			progressStatus: getProgressStatus(caseItem),
+			priority: getPriority(caseItem),
+		}))
 }
 
 function CaseListItem({ caseItem, onOpen }) {
@@ -49,16 +79,11 @@ function CaseListItem({ caseItem, onOpen }) {
 	)
 }
 
-export default function MyCases({ currentUser }) {
+export default function MyCases({ currentUser, caseTeams }) {
 	const navigate = useNavigate()
 	const [searchQuery, setSearchQuery] = useState('')
 	const [activeFilter, setActiveFilter] = useState('All')
-	const policeRole = getPoliceRole(currentUser)
-	const cases = (policeRole?.ownCases || []).map((caseItem) => ({
-		...caseItem,
-		progressStatus: getProgressStatus(caseItem),
-		priority: getPriority(caseItem),
-	}))
+	const cases = getAssignmentDrivenCases(currentUser, caseTeams)
 	const filteredCases = useMemo(() => {
 		const query = searchQuery.trim().toLowerCase()
 		return cases.filter((caseItem) => (

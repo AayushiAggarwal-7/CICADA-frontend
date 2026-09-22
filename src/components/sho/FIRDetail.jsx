@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 const assignmentRoles = [
 	'Primary Investigating Officer',
@@ -11,11 +11,14 @@ export default function FIRDetail({ fir, team, officerOptions, onAddOfficer, onR
 	const [officerId, setOfficerId] = useState('')
 	const [assignmentRole, setAssignmentRole] = useState(assignmentRoles[0])
 	const [isAddingOfficer, setIsAddingOfficer] = useState(false)
+	const [memberToRemove, setMemberToRemove] = useState(null)
+	const lastFocusedElement = useRef(null)
 
 	useEffect(() => {
 		setOfficerId('')
 		setAssignmentRole(assignmentRoles[0])
 		setIsAddingOfficer(false)
+		setMemberToRemove(null)
 	}, [fir.id])
 
 	const selectedOfficer = officerOptions.find((officer) => officer.id === officerId)
@@ -23,6 +26,22 @@ export default function FIRDetail({ fir, team, officerOptions, onAddOfficer, onR
 	const assignedOfficerIds = new Set(team.map((teamMember) => teamMember.officerId))
 	const availableOfficers = officerOptions.filter((officer) => !assignedOfficerIds.has(officer.id))
 	const canAddPrimary = !existingPrimary
+
+	const openRemovalDialog = (member) => {
+		lastFocusedElement.current = document.activeElement
+		setMemberToRemove(member)
+	}
+
+	const closeRemovalDialog = () => {
+		setMemberToRemove(null)
+		window.setTimeout(() => lastFocusedElement.current?.focus(), 0)
+	}
+
+	const confirmRemoval = () => {
+		if (!memberToRemove) return
+		onRemoveOfficer(fir.id, memberToRemove.officerId)
+		closeRemovalDialog()
+	}
 
 	const handleSubmit = (event) => {
 		event.preventDefault()
@@ -59,9 +78,9 @@ export default function FIRDetail({ fir, team, officerOptions, onAddOfficer, onR
 					{team.length > 0 ? (
 						<div className="sho-team-list">
 							{team.map((teamMember) => (
-								<div className="sho-team-member" key={teamMember.officerId}>
+									<div className="sho-team-member" key={teamMember.officerId}>
 									<div className="sho-team-member-copy"><span className="sho-team-role">{teamMember.assignmentRole}</span><strong>{officerOptions.find((officer) => officer.id === teamMember.officerId)?.name || teamMember.officerId}</strong><small>{teamMember.designation}</small></div>
-									<button type="button" className="sho-remove-officer" onClick={() => onRemoveOfficer(fir.id, teamMember.officerId)}>Remove</button>
+										<button type="button" className="sho-remove-officer" onClick={() => openRemovalDialog(teamMember)}>Remove</button>
 								</div>
 							))}
 						</div>
@@ -76,6 +95,52 @@ export default function FIRDetail({ fir, team, officerOptions, onAddOfficer, onR
 					)}
 				</section>
 			</div>
+			{memberToRemove && <RemovalConfirmationDialog member={memberToRemove} officer={officerOptions.find((officer) => officer.id === memberToRemove.officerId)} onCancel={closeRemovalDialog} onConfirm={confirmRemoval} />}
 		</section>
+	)
+}
+
+function RemovalConfirmationDialog({ member, officer, onCancel, onConfirm }) {
+	const cancelButtonRef = useRef(null)
+	const dialogRef = useRef(null)
+	const isPrimary = member.assignmentRole === 'Primary Investigating Officer'
+
+	useEffect(() => {
+		cancelButtonRef.current?.focus()
+		const handleKeyDown = (event) => {
+			if (event.key === 'Escape') {
+				event.preventDefault()
+				onCancel()
+				return
+			}
+			if (event.key !== 'Tab') return
+			const focusable = dialogRef.current?.querySelectorAll('button:not([disabled])') || []
+			if (focusable.length === 0) return
+			const first = focusable[0]
+			const last = focusable[focusable.length - 1]
+			if (event.shiftKey && document.activeElement === first) {
+				event.preventDefault()
+				last.focus()
+			} else if (!event.shiftKey && document.activeElement === last) {
+				event.preventDefault()
+				first.focus()
+			}
+		}
+		document.addEventListener('keydown', handleKeyDown)
+		return () => document.removeEventListener('keydown', handleKeyDown)
+	}, [onCancel])
+
+	return (
+		<div className="sho-team-modal-backdrop" role="presentation">
+			<section className="sho-team-modal" ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="remove-officer-title">
+				<p className="sho-eyebrow">Case action</p>
+				<h2 id="remove-officer-title">{isPrimary ? 'Remove Primary Investigating Officer' : 'Remove Officer'}</h2>
+				<p>Are you sure you want to remove</p>
+				<div className="sho-team-modal-officer"><strong>{officer?.name || member.officerId}</strong><span>{officer?.designation || member.designation}</span><span>{member.assignmentRole}</span></div>
+				<p>from this case{isPrimary ? ' as the Primary Investigating Officer' : ''}?</p>
+				<p className="sho-team-modal-warning">{isPrimary ? 'The case will have no Primary Investigating Officer after this action.' : 'This officer will be removed from the current investigation team.'}</p>
+				<div className="sho-team-modal-actions"><button type="button" className="sho-cancel-button" ref={cancelButtonRef} onClick={onCancel}>Cancel</button><button type="button" className="sho-danger-button" onClick={onConfirm}>Remove Officer</button></div>
+			</section>
+		</div>
 	)
 }

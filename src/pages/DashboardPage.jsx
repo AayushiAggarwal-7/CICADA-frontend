@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import ProfileViewerModal from '../components/ProfileViewerModal'
 import FIRInbox from '../components/sho/FIRInbox'
-import MyCases from '../components/sho/MyCases'
+import MyCases, { getAssignmentDrivenCases } from '../components/sho/MyCases'
 import CaseWorkspace from '../components/sho/case-workspace/CaseWorkspace'
 import SHODashboardHome from '../components/sho/SHODashboardHome'
 import SHOSidebar from '../components/sho/SHOSidebar'
@@ -44,6 +44,7 @@ export default function DashboardPage() {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
   const [caseTeams, setCaseTeams] = useState(initialCaseTeams)
   const { pathname } = useLocation()
+  const assignedCases = getAssignmentDrivenCases(currentUser, caseTeams)
 
   const markFirReviewed = (caseId) => {
     setCaseTeams((previous) => (
@@ -99,13 +100,13 @@ export default function DashboardPage() {
         />
         <main className="sho-dashboard-content">
           {pathname === '/dashboard' ? (
-            <SHODashboardHome currentUser={currentUser} onNavigate={navigateToSection} />
+            <SHODashboardHome currentUser={currentUser} myCases={assignedCases} onNavigate={navigateToSection} />
           ) : pathname === '/dashboard/fir-inbox' ? (
             <FIRInbox currentUser={currentUser} caseTeams={caseTeams} onMarkReviewed={markFirReviewed} onAddOfficer={addTeamMember} onRemoveOfficer={removeTeamMember} onBack={() => navigate('/dashboard')} />
           ) : pathname === '/dashboard/my-cases' ? (
-            <MyCases currentUser={currentUser} />
+            <MyCases currentUser={currentUser} caseTeams={caseTeams} />
           ) : pathname.startsWith('/dashboard/my-cases/') ? (
-            <CaseWorkspace currentUser={currentUser} caseTeams={caseTeams} />
+          <CaseWorkspace currentUser={currentUser} caseTeams={caseTeams} myCases={assignedCases} />
           ) : (
             <section className="sho-placeholder-panel" aria-labelledby="coming-next-title">
               <span className="sho-placeholder-mark" aria-hidden="true">DEMS</span>

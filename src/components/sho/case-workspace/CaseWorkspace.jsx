@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { policeRoles } from '../../../data/policeData'
 import CaseActivity from './CaseActivity'
 import CaseDocuments from './CaseDocuments'
 import CaseEvidence from './CaseEvidence'
@@ -21,20 +20,10 @@ const tabs = [
 
 const tabComponents = { documents: CaseDocuments, evidence: CaseEvidence, team: CaseTeam, fsl: CaseFSL, activity: CaseActivity, more: CaseMore }
 
-function getAssignedCases(currentUser) {
-	const roleId = currentUser?.roleId === 'police_sho' ? 'sho' : currentUser?.roleId?.replace(/^police_/, '')
-	const policeRole = policeRoles.find((role) => role.id === roleId) || policeRoles.find((role) => role.id === 'sho')
-	return (policeRole?.ownCases || []).map((caseItem) => ({
-		...caseItem,
-		progressStatus: caseItem.progressStatus || (caseItem.status?.toLowerCase().includes('court') ? 'In Court' : 'Under Investigation'),
-		priority: caseItem.priority || (caseItem.statusLevel === 'critical' ? 'Critical' : caseItem.statusLevel === 'urgent' ? 'Urgent' : 'Routine'),
-	}))
-}
-
-export default function CaseWorkspace({ currentUser, caseTeams }) {
+export default function CaseWorkspace({ currentUser, caseTeams, myCases = [] }) {
 	const { caseId } = useParams()
 	const navigate = useNavigate()
-	const caseItem = getAssignedCases(currentUser).find((item) => item.id === caseId)
+	const caseItem = myCases.find((item) => item.id === caseId)
 	const team = caseTeams?.[caseId] || []
 	const [activeTab, setActiveTab] = useState('overview')
 

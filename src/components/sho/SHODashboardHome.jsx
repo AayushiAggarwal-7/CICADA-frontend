@@ -1,5 +1,4 @@
 import React from 'react'
-import { masterCaseDatabase } from '../../data/demsData'
 import { policeRoles } from '../../data/policeData'
 
 // Prototype-only notifications until the station notification source is connected.
@@ -36,12 +35,9 @@ function CaseRow({ caseItem }) {
 	)
 }
 
-export default function SHODashboardHome({ currentUser, onNavigate }) {
-	const roleCases = masterCaseDatabase.filter(
-		(caseItem) => caseItem.orgType === 'police' && caseItem.roleTarget === (currentUser?.roleId || 'police_sho')
-	)
-	const recentCases = roleCases.slice(0, 3)
-	const attentionCases = roleCases.filter((caseItem) => caseItem.progressStatus !== 'Closed' && caseItem.progressStatus !== 'Archived').slice(0, 4)
+export default function SHODashboardHome({ currentUser, myCases = [], onNavigate }) {
+	const recentCases = myCases.slice(0, 3)
+	const attentionCases = myCases.filter((caseItem) => caseItem.progressStatus !== 'Closed' && caseItem.progressStatus !== 'Archived').slice(0, 4)
 	const officerProfile = policeRoles.find((role) => role.id === 'sho')?.defaultOfficer
 
 	return (
