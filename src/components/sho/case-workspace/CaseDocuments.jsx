@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 
 const categories = ['All', 'FIR & Complaint', 'Investigation', 'Witness Statement', 'Evidence / Seizure', 'Forensic Report', 'Court / Legal', 'Other']
 const processingStatuses = ['All', 'Processed', 'Processing', 'Pending']
@@ -31,6 +31,19 @@ export default function CaseDocuments({ caseItem }) {
 	const [selectedDocument, setSelectedDocument] = useState(null)
 	const [downloadMessage, setDownloadMessage] = useState('')
 	const documents = prototypeDocuments[caseItem.id] || []
+	useEffect(() => {
+		if (!selectedDocument) return undefined
+		const handleKeyDown = (event) => {
+			if (event.key === 'Escape') setSelectedDocument(null)
+		}
+		const previousOverflow = document.body.style.overflow
+		document.body.style.overflow = 'hidden'
+		document.addEventListener('keydown', handleKeyDown)
+		return () => {
+			document.body.style.overflow = previousOverflow
+			document.removeEventListener('keydown', handleKeyDown)
+		}
+	}, [selectedDocument])
 	const filteredDocuments = useMemo(() => {
 		const query = searchQuery.trim().toLowerCase()
 		return documents.filter((document) => (
@@ -72,19 +85,21 @@ export default function CaseDocuments({ caseItem }) {
 					<tbody>{filteredDocuments.map((document) => <tr key={document.id}>
 						<td><strong className="sho-document-name">{document.name}</strong><span className="sho-document-pages">{document.pageCount} pages</span></td><td>{document.category}</td><td>v{document.version}</td><td>{document.uploadedBy}</td><td className="sho-document-muted">{document.uploadedDate}</td>
 						<td><StatusBadge tone={document.processingStatus.toLowerCase()}>{document.processingStatus}</StatusBadge></td><td><StatusBadge tone={document.integrityStatus === 'SHA-256 Verified' ? 'verified' : 'pending'}>{document.integrityStatus}</StatusBadge></td>
-						<td className="sho-document-actions"><button type="button" className="sho-review-button" onClick={() => setSelectedDocument(document)}>View</button>{document.access.includes('Download') && <button type="button" className="sho-document-download" onClick={() => setDownloadMessage('Download will be enabled after backend integration.')}>Download</button>}</td>
+						<td className="sho-document-actions"><button type="button" className="sho-review-button" onClick={() => setSelectedDocument(document)}>View</button></td>
 					</tr>)}</tbody>
 				</table>
 			</div> : <div className="sho-documents-empty"><h3>No documents found</h3><p>Try a different search term or reset the document filters.</p><button type="button" className="sho-secondary-button" onClick={resetFilters}>Reset filters</button></div>}
 
-			{selectedDocument && <aside className="sho-document-detail" aria-labelledby="document-detail-title">
-				<div className="sho-document-detail-heading"><div><p className="sho-eyebrow">Document metadata</p><h3 id="document-detail-title">{selectedDocument.name}</h3></div><button type="button" className="sho-detail-close" aria-label="Close document details" onClick={() => setSelectedDocument(null)}>×</button></div>
+			{selectedDocument && <div className="sho-detail-modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setSelectedDocument(null)}>
+				<aside className="sho-detail-modal sho-document-detail" role="dialog" aria-modal="true" aria-labelledby="document-detail-title">
+				<div className="sho-document-detail-heading"><div><p className="sho-eyebrow">Document metadata</p><h3 id="document-detail-title">{selectedDocument.name}</h3></div><button type="button" className="sho-detail-modal-close" aria-label="Close document details" onClick={() => setSelectedDocument(null)}>×</button></div>
 				<dl className="sho-document-detail-fields">
 					<div><dt>Category</dt><dd>{selectedDocument.category}</dd></div><div><dt>Version</dt><dd>v{selectedDocument.version}</dd></div><div><dt>Uploaded by</dt><dd>{selectedDocument.uploadedBy}</dd></div><div><dt>Upload date</dt><dd>{selectedDocument.uploadedDate}</dd></div>
 					<div><dt>Page count</dt><dd>{selectedDocument.pageCount} pages</dd></div><div><dt>Processing status</dt><dd><StatusBadge tone={selectedDocument.processingStatus.toLowerCase()}>{selectedDocument.processingStatus}</StatusBadge></dd></div><div><dt>Integrity status</dt><dd><StatusBadge tone={selectedDocument.integrityStatus === 'SHA-256 Verified' ? 'verified' : 'pending'}>{selectedDocument.integrityStatus}</StatusBadge></dd></div>
 					<div className="sho-document-access-field"><dt>Access permissions</dt><dd><span className="sho-document-access-note">Permission-controlled prototype access</span><span className="sho-document-access-list">{selectedDocument.access.join(' / ')}</span></dd></div>
 				</dl>
-			</aside>}
+				</aside>
+			</div>}
 		</section>
 	)
 }

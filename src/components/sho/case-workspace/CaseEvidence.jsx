@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 
 const evidenceFilters = ['All', 'In Custody', 'With FSL', 'Returned', 'Released / Disposed']
 
@@ -66,6 +66,19 @@ export default function CaseEvidence({ caseItem }) {
 	const [selectedEvidence, setSelectedEvidence] = useState(null)
 	const [mediaMessage, setMediaMessage] = useState('')
 	const evidence = prototypeEvidence[caseItem.id] || []
+	useEffect(() => {
+		if (!selectedEvidence) return undefined
+		const handleKeyDown = (event) => {
+			if (event.key === 'Escape') setSelectedEvidence(null)
+		}
+		const previousOverflow = document.body.style.overflow
+		document.body.style.overflow = 'hidden'
+		document.addEventListener('keydown', handleKeyDown)
+		return () => {
+			document.body.style.overflow = previousOverflow
+			document.removeEventListener('keydown', handleKeyDown)
+		}
+	}, [selectedEvidence])
 	const filteredEvidence = useMemo(() => {
 		const query = searchQuery.trim().toLowerCase()
 		return evidence.filter((item) => (
@@ -107,8 +120,9 @@ export default function CaseEvidence({ caseItem }) {
 				</table>
 			</div> : <div className="sho-evidence-empty"><h3>{evidence.length === 0 ? 'No evidence recorded' : 'No evidence found'}</h3><p>{evidence.length === 0 ? 'No evidence records are currently available for this case.' : 'Try a different search term or reset the evidence filter.'}</p>{evidence.length > 0 && <button type="button" className="sho-secondary-button" onClick={resetFilters}>Reset filters</button>}</div>}
 
-			{selectedEvidence && <aside className="sho-evidence-detail" aria-labelledby="evidence-detail-title">
-				<div className="sho-evidence-detail-heading"><div><p className="sho-eyebrow">Exhibit record</p><h3 id="evidence-detail-title">{selectedEvidence.id}</h3></div><button type="button" className="sho-detail-close" aria-label="Close evidence details" onClick={() => setSelectedEvidence(null)}>×</button></div>
+			{selectedEvidence && <div className="sho-detail-modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setSelectedEvidence(null)}>
+				<aside className="sho-detail-modal sho-evidence-detail" role="dialog" aria-modal="true" aria-labelledby="evidence-detail-title">
+				<div className="sho-evidence-detail-heading"><div><p className="sho-eyebrow">Exhibit record</p><h3 id="evidence-detail-title">{selectedEvidence.id}</h3></div><button type="button" className="sho-detail-modal-close" aria-label="Close evidence details" onClick={() => setSelectedEvidence(null)}>×</button></div>
 				<dl className="sho-evidence-detail-fields"><div><dt>Evidence ID</dt><dd>{selectedEvidence.id}</dd></div><div><dt>Type</dt><dd>{selectedEvidence.type}</dd></div><div className="sho-evidence-detail-wide"><dt>Description</dt><dd>{selectedEvidence.description}</dd></div><div><dt>Current custodian</dt><dd>{selectedEvidence.custodian}</dd></div><div><dt>Current location</dt><dd>{selectedEvidence.location}</dd></div><div><dt>Current status</dt><dd><StatusBadge status={selectedEvidence.status} /></dd></div></dl>
 				<section className="sho-evidence-media" aria-labelledby="evidence-media-title">
 					<div className="sho-evidence-detail-heading"><div><p className="sho-eyebrow">Attachment area</p><h3 id="evidence-media-title">Evidence Media</h3></div><button type="button" className="sho-secondary-button" disabled>Upload Media</button></div>
@@ -116,7 +130,8 @@ export default function CaseEvidence({ caseItem }) {
 					{mediaMessage && <p className="sho-evidence-media-message" role="status">{mediaMessage}<button type="button" onClick={() => setMediaMessage('')}>Dismiss</button></p>}
 				</section>
 				<div className="sho-custody-history"><div className="sho-evidence-detail-heading"><div><p className="sho-eyebrow">Traceability</p><h3>Custody History</h3></div><span className="sho-evidence-history-note">Prototype record</span></div><ol>{selectedEvidence.custodyHistory.map((event) => <li key={`${event.date}-${event.action}`}><time>{event.date}</time><strong>{event.action}</strong><span>{event.officer}</span><small>{event.location}</small></li>)}</ol></div>
-			</aside>}
+				</aside>
+			</div>}
 		</section>
 	)
 }

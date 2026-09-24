@@ -1,4 +1,5 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import { policeRoles } from '../../data/policeData'
 
 // Prototype-only notifications until the station notification source is connected.
@@ -21,24 +22,28 @@ function getGreeting() {
 	return 'Good evening'
 }
 
-function CaseRow({ caseItem }) {
+function CaseRow({ caseItem, onOpen }) {
 	return (
-		<li className="sho-case-row">
-			<div className="sho-case-row-content">
-				<span className="sho-case-number">{caseItem.firNumber}</span>
-				<strong>{caseItem.title}</strong>
-			</div>
-			<span className={`sho-status-tag ${caseItem.priority?.toLowerCase() || 'routine'}`}>
-				{caseItem.priority || caseItem.progressStatus}
-			</span>
+		<li>
+			<button type="button" className="sho-case-row" onClick={() => onOpen(caseItem)}>
+				<div className="sho-case-row-content">
+					<span className="sho-case-number">{caseItem.firNumber}</span>
+					<strong>{caseItem.title}</strong>
+				</div>
+				<span className={`sho-status-tag ${caseItem.priority?.toLowerCase() || 'routine'}`}>
+					{caseItem.priority || caseItem.progressStatus}
+				</span>
+			</button>
 		</li>
 	)
 }
 
 export default function SHODashboardHome({ currentUser, myCases = [], onNavigate }) {
+	const navigate = useNavigate()
 	const recentCases = myCases.slice(0, 3)
 	const attentionCases = myCases.filter((caseItem) => caseItem.progressStatus !== 'Closed' && caseItem.progressStatus !== 'Archived').slice(0, 4)
 	const officerProfile = policeRoles.find((role) => role.id === 'sho')?.defaultOfficer
+	const openCase = (caseItem) => navigate(`/dashboard/my-cases/${caseItem.id}`)
 
 	return (
 		<div className="sho-home">
@@ -58,11 +63,11 @@ export default function SHODashboardHome({ currentUser, myCases = [], onNavigate
 				</div>
 				<div className="sho-attention-list">
 					{attentionCases.map((caseItem) => (
-						<article className="sho-attention-item" key={caseItem.id}>
+						<button type="button" className="sho-attention-item" key={caseItem.id} onClick={() => openCase(caseItem)}>
 							<span className={`sho-attention-marker ${caseItem.priority?.toLowerCase() || 'routine'}`} />
-									<div className="sho-attention-content"><span className="sho-case-number">{caseItem.firNumber}</span><h3>{attentionLabels[caseItem.progressStatus] || 'Case requires action'}</h3><p>{caseItem.stage}</p></div>
+							<div className="sho-attention-content"><span className="sho-case-number">{caseItem.firNumber}</span><h3>{attentionLabels[caseItem.progressStatus] || 'Case requires action'}</h3><p>{caseItem.stage}</p></div>
 							<span className="sho-attention-date">{caseItem.date}</span>
-						</article>
+						</button>
 					))}
 				</div>
 			</section>
@@ -80,7 +85,7 @@ export default function SHODashboardHome({ currentUser, myCases = [], onNavigate
 
 				<section className="sho-panel" aria-labelledby="recent-cases-heading">
 					<div className="sho-section-heading"><div><p className="sho-eyebrow">Assigned to you</p><h2 id="recent-cases-heading">My recent cases</h2></div><button type="button" className="sho-text-button" onClick={() => onNavigate('my-cases')}>View all</button></div>
-					<ul className="sho-case-list">{recentCases.map((caseItem) => <CaseRow key={caseItem.id} caseItem={caseItem} />)}</ul>
+					<ul className="sho-case-list">{recentCases.map((caseItem) => <CaseRow key={caseItem.id} caseItem={caseItem} onOpen={openCase} />)}</ul>
 				</section>
 
 				<section className="sho-panel sho-notifications-panel" aria-labelledby="notifications-heading">

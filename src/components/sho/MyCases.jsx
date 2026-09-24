@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { masterCaseDatabase } from '../../data/demsData'
 import { policeRoles } from '../../data/policeData'
 
-const progressFilters = ['All', 'Active', 'Under Investigation', 'In Court', 'Closed', 'Archived']
+const progressFilters = ['All', 'Active', 'Under Investigation', 'In Court', 'Closed']
 
 function getPoliceRole(currentUser) {
 	const roleId = currentUser?.roleId?.replace(/^police_/, '')
@@ -17,9 +17,6 @@ export function getCurrentOfficerId(currentUser) {
 function getCaseMetadata() {
 	const metadata = new Map()
 	masterCaseDatabase.filter((caseItem) => caseItem.orgType === 'police').forEach((caseItem) => metadata.set(caseItem.id, caseItem))
-	policeRoles.forEach((role) => role.ownCases?.forEach((caseItem) => {
-		if (!metadata.has(caseItem.id)) metadata.set(caseItem.id, caseItem)
-	}))
 	return metadata
 }
 
@@ -35,13 +32,6 @@ function getProgressStatus(caseItem) {
 	return 'Under Investigation'
 }
 
-function getPriority(caseItem) {
-	if (caseItem.priority) return caseItem.priority
-	if (caseItem.statusLevel === 'critical') return 'Critical'
-	if (caseItem.statusLevel === 'urgent') return 'Urgent'
-	return 'Routine'
-}
-
 export function getAssignmentDrivenCases(currentUser, caseTeams = {}) {
 	const officerId = getCurrentOfficerId(currentUser)
 	const caseMetadata = getCaseMetadata()
@@ -55,27 +45,23 @@ export function getAssignmentDrivenCases(currentUser, caseTeams = {}) {
 		.map((caseItem) => ({
 			...caseItem,
 			progressStatus: getProgressStatus(caseItem),
-			priority: getPriority(caseItem),
 		}))
 }
 
-function CaseListItem({ caseItem, onOpen }) {
+function CaseListItem({ caseItem, onOpen, station }) {
 	return (
-		<article className="sho-my-case-item">
+		<button type="button" className="sho-my-case-item" onClick={() => onOpen(caseItem)}>
 			<div className="sho-my-case-main">
 				<span className="sho-case-number">{caseItem.firNumber}</span>
 				<h2>{caseItem.title}</h2>
-				<p className="sho-my-case-stage"><strong>Investigation stage:</strong> {caseItem.stage || 'Stage not recorded'}</p>
 			</div>
+			<span className={`sho-case-progress ${caseItem.progressStatus.toLowerCase().replaceAll(' ', '-')}`}>{caseItem.progressStatus}</span>
 			<div className="sho-my-case-meta">
-				<span className={`sho-case-progress ${caseItem.progressStatus.toLowerCase().replaceAll(' ', '-')}`}>{caseItem.progressStatus}</span>
-				<div><span>Primary IO</span><strong>{caseItem.ioName || 'Not assigned'}</strong></div>
-				<div><span>Priority</span><strong className={`sho-priority-text ${caseItem.priority?.toLowerCase()}`}>{caseItem.priority || 'Routine'}</strong></div>
-				<div><span>Evidence</span><strong>{caseItem.evidenceItems ?? 0}</strong></div>
-				<div><span>Case diary</span><strong>{caseItem.caseDiaryEntries ?? 0}</strong></div>
+				<div><span>Current stage</span><strong>{caseItem.stage || 'Stage not recorded'}</strong></div>
+				<div><span>FIR date</span><strong>{caseItem.date || 'Date not recorded'}</strong></div>
+				<div><span>Police station</span><strong>{caseItem.policeStation || station}</strong></div>
 			</div>
-			<button type="button" className="sho-primary-button sho-open-case-button" onClick={() => onOpen(caseItem)}>Open Case <span aria-hidden="true">→</span></button>
-		</article>
+		</button>
 	)
 }
 
@@ -84,6 +70,7 @@ export default function MyCases({ currentUser, caseTeams }) {
 	const [searchQuery, setSearchQuery] = useState('')
 	const [activeFilter, setActiveFilter] = useState('All')
 	const cases = getAssignmentDrivenCases(currentUser, caseTeams)
+	const station = currentUser?.station || 'Central Police Station, Division I'
 	const filteredCases = useMemo(() => {
 		const query = searchQuery.trim().toLowerCase()
 		return cases.filter((caseItem) => (
@@ -100,7 +87,7 @@ export default function MyCases({ currentUser, caseTeams }) {
 					<h1 id="my-cases-title">My Cases</h1>
 					<p>Cases directly assigned to you for investigation and station oversight.</p>
 				</div>
-				<div className="sho-my-cases-count"><strong>{filteredCases.length}</strong><span>cases shown</span></div>
+				<div className="sho-my-cases-count"><strong>{filteredCases.length}</strong><span>Total cases</span></div>
 			</header>
 
 			<div className="sho-my-cases-toolbar">
@@ -111,7 +98,7 @@ export default function MyCases({ currentUser, caseTeams }) {
 			</div>
 
 			<div className="sho-my-case-list">
-				{filteredCases.map((caseItem) => <CaseListItem key={caseItem.id} caseItem={caseItem} onOpen={(selectedCase) => navigate(`/dashboard/my-cases/${selectedCase.id}`)} />)}
+					{filteredCases.map((caseItem) => <CaseListItem key={caseItem.id} caseItem={caseItem} station={station} onOpen={(selectedCase) => navigate(`/dashboard/my-cases/${selectedCase.id}`, { state: { from: 'my-cases' } })} />)}
 				{filteredCases.length === 0 && <div className="sho-empty-state sho-my-cases-empty">No cases match the current search and progress filter.</div>}
 			</div>
 		</section>

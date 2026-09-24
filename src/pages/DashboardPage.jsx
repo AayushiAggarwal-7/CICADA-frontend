@@ -47,7 +47,7 @@ export default function DashboardPage() {
   const [caseTeams, setCaseTeams] = useState(initialCaseTeams)
   const { pathname } = useLocation()
   const assignedCases = getAssignmentDrivenCases(currentUser, caseTeams)
-  const stationCases = getStationCases()
+  const stationCases = getStationCases(caseTeams, currentUser)
   const workspaceCases = [...assignedCases, ...stationCases.filter((stationCase) => !assignedCases.some((assignedCase) => assignedCase.id === stationCase.id))]
 
   const markFirReviewed = (caseId) => {
