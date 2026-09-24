@@ -8,7 +8,7 @@ import secretariatHeroImg from '../assets/tiranga.png'
  * - Subtitle: "A unified platform for secure, tamper-evident digital evidence workflow across agencies."
  * - [ Register ] and [ Login ] buttons
  */
-export default function HeroSection({ onOpenLogin, onOpenRegister }) {
+export default function HeroSection({ onOpenLogin, onOpenRegister, copy }) {
   const navigate = useNavigate()
 
   return (
@@ -22,11 +22,11 @@ export default function HeroSection({ onOpenLogin, onOpenRegister }) {
       <div className="site-container hero-inner-container">
         <div className="hero-content-block">
           <h1 className="hero-main-headline">
-            Welcome to e-SAKSHYA
+            {copy.title}
           </h1>
 
           <p className="hero-sub-text">
-            Secure, auditable digital evidence and case-document workflows across Police, Forensics, Prosecution, and Judiciary.
+            {copy.description}
           </p>
 
           <div className="hero-cta-buttons-row">
@@ -35,14 +35,14 @@ export default function HeroSection({ onOpenLogin, onOpenRegister }) {
               className="btn-animated btn-hero-action btn-hero-reg"
               onClick={() => (onOpenRegister ? onOpenRegister() : navigate('/register'))}
             >
-              Register
+              {copy.register}
             </button>
             <button
               type="button"
               className="btn-animated btn-hero-action btn-hero-log"
               onClick={() => (onOpenLogin ? onOpenLogin() : navigate('/login'))}
             >
-              Login
+              {copy.login}
             </button>
           </div>
         </div>

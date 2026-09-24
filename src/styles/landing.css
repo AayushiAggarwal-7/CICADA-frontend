@@ -14,12 +14,105 @@ body {
 
 /* === Top navy accent bar === */
 .gov-universal-header::before {
-  content: '';
-  display: block;
-  width: 100%;
-  height: 30px;
-  background: var(--color-navy-dark);
+  display: none;
 }
+
+.public-utility-bar {
+  position: relative;
+  z-index: 1000;
+  height: 32px;
+  background: var(--color-navy-dark);
+  color: #ffffff;
+}
+
+.public-utility-inner {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.public-utility-government {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.public-utility-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.public-utility-control {
+  position: relative;
+}
+
+.public-utility-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 29px;
+  height: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.86);
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.public-utility-button:hover,
+.public-utility-button:focus-visible {
+  color: #f5d27c;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.public-utility-button[aria-expanded='true'] {
+  color: #f5d27c;
+}
+
+.public-utility-button svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.6;
+}
+
+.public-utility-text-button svg { width: 15px; height: 15px; }
+.public-utility-language-button { font-size: 12px; }
+
+.public-utility-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 20;
+  display: grid;
+  gap: 8px;
+  width: 220px;
+  padding: 13px;
+  border: 1px solid #d5dde5;
+  background: #ffffff;
+  box-shadow: 0 10px 24px rgba(10, 37, 64, 0.18);
+  color: #20384f;
+  font-size: 11px;
+}
+
+.public-utility-panel strong { font-size: 12px; }
+.public-utility-panel p,
+.public-utility-panel small { margin: 0; color: #657688; font-size: 10px; line-height: 1.45; }
+.public-utility-panel button { justify-self: start; padding: 5px 8px; border: 1px solid #cbd5df; background: #f7f9fa; color: #20384f; cursor: pointer; font-size: 10px; font-weight: 700; }
+.public-utility-panel button.is-selected { border-color: var(--color-ochre-gold); background: #f5e9d3; color: #8e621e; }
 
 /* ==========================================================================
    HERO — fixed image framing + darkened overlay + reduced height
