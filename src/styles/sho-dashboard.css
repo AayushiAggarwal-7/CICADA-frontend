@@ -446,15 +446,12 @@
 .sho-station-table th { font-size: 11.5px; }
 .sho-station-table td { font-size: 12.5px; }
 .sho-station-table td strong { font-weight: 700; }
-.sho-table-fir-number,
 .sho-evidence-id,
 .sho-station-fir { color: #8f6728; font-size: 11.5px; }
-.sho-table-muted, .sho-table-station,
+.sho-table-muted,
 .sho-document-muted,
 .sho-evidence-muted { color: #718294 !important; }
-.sho-table-title,
 .sho-document-name { display: block; color: #273f57; font-size: 12px; line-height: 1.35; }
-.sho-table-secondary,
 .sho-document-pages { display: block; margin-top: 4px; color: #8a98a5; font-size: 10.5px; line-height: 1.3; }
 .sho-inbox-status,
 .sho-document-status,
@@ -485,10 +482,6 @@
 .sho-evidence-status.returned,
 .sho-evidence-status.released-disposed,
 .sho-fsl-status.all { background: #edf1f7; color: #365779; }
-.sho-assignment-cell strong, .sho-assignment-cell span { display: block; }
-.sho-assignment-cell strong { color: #354d63; font-size: 11.5px; }
-.sho-assignment-cell span { margin-top: 3px; color: #82909e; font-size: 10px; }
-.sho-unassigned-label { color: #a16e24 !important; font-weight: 700; }
 .sho-review-button { background: #fff; color: #8e621e; }
 .sho-empty-state { padding: 40px !important; color: #728294 !important; text-align: center; }
 .sho-back-link { display: block; margin-bottom: 16px; padding: 0; border: 0; background: transparent; color: #8e621e; cursor: pointer; font-size: 11.5px; font-weight: 800; }
@@ -526,10 +519,6 @@
 
 @media (max-width: 680px) { .sho-my-cases-count { align-items: flex-start; margin-top: 14px; }.sho-my-cases-toolbar { align-items: stretch; flex-direction: column; }.sho-my-cases-toolbar .sho-inbox-search { max-width: none; }.sho-my-case-meta { grid-template-columns: repeat(2, 1fr); gap: 12px; }.sho-overview-grid { grid-template-columns: 1fr; }.sho-overview-facts dd { max-width: 58%; }.sho-case-workspace-identity h1 { font-size: 21px; }.sho-case-workspace-identity h2 { font-size: 14px; } }
 .sho-team-count { display: block; margin-top: 4px; color: #78899a; font-size: 10px; }
-@media (max-width: 1000px) {
-}
-@media (max-width: 680px) {
-}
 .sho-team-read-only-note { margin: 16px 0 0; padding: 9px 10px; border-left: 3px solid #b37d2e; background: #fff8ea; color: #76541d; font-size: 10px; }
 .sho-add-officer-button { padding: 7px 9px; border: 1px solid #b37d2e; background: #fff; color: #8e621e; cursor: pointer; font-size: 10px; font-weight: 800; white-space: nowrap; }
 .sho-add-officer-button:hover:not(:disabled) { background: #f8eedf; }.sho-add-officer-button:disabled { border-color: #d5dce3; color: #9ba7b2; cursor: not-allowed; }

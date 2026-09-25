@@ -118,3 +118,12 @@
   .sho-my-cases .sho-my-case-item { padding: 18px 16px; }
   .sho-my-cases .sho-my-case-meta { grid-template-columns: 1fr; gap: 12px; }
 }
+
+.sho-table-fir-number { color: #8f6728; font-size: 11.5px; }
+.sho-table-station { color: #718294 !important; }
+.sho-table-title { display: block; color: #273f57; font-size: 12px; line-height: 1.35; }
+.sho-table-secondary { display: block; margin-top: 4px; color: #8a98a5; font-size: 10.5px; line-height: 1.3; }
+.sho-assignment-cell strong, .sho-assignment-cell span { display: block; }
+.sho-assignment-cell strong { color: #354d63; font-size: 11.5px; }
+.sho-assignment-cell span { margin-top: 3px; color: #82909e; font-size: 10px; }
+.sho-unassigned-label { color: #a16e24 !important; font-weight: 700; }
