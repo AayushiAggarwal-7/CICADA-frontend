@@ -127,3 +127,20 @@
 .sho-assignment-cell strong { color: #354d63; font-size: 11.5px; }
 .sho-assignment-cell span { margin-top: 3px; color: #82909e; font-size: 10px; }
 .sho-unassigned-label { color: #a16e24 !important; font-weight: 700; }
+
+.sho-fir-detail-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(300px, .8fr); gap: 18px; }
+.sho-fir-detail-heading { align-items: flex-start; }
+.sho-fir-detail-heading-copy { min-width: 0; }
+.sho-fir-detail-heading .sho-eyebrow,
+.sho-fir-detail .sho-detail-panel-heading .sho-eyebrow { margin-left: 0; }
+.sho-fir-detail-heading h1 { margin: 0; color: #102d4b; font-size: clamp(25px, 2vw, 28px); line-height: 1.15; }
+.sho-fir-detail-title { margin: 7px 0 0; color: #354c62; font-size: 14px; line-height: 1.4; }
+.sho-fir-detail .sho-detail-panel-heading h2 { font-size: 20px; }
+.sho-fir-detail .sho-detail-fields dt,
+.sho-fir-detail .sho-summary-block h3,
+.sho-fir-detail .sho-team-role { font-size: 11px; }
+.sho-fir-detail .sho-detail-fields dd,
+.sho-fir-detail .sho-summary-block p { font-size: 14px; }
+.sho-fir-detail .sho-team-member-copy strong { font-size: 14px; }
+.sho-fir-detail .sho-team-member-copy small { font-size: 12px; }
+@media (max-width: 900px) { .sho-fir-detail-grid { grid-template-columns: 1fr; } }
