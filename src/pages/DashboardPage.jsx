@@ -10,6 +10,7 @@ import SHOSidebar from '../components/sho/SHOSidebar'
 import SHOTopbar from '../components/sho/SHOTopbar'
 import StationCases, { getStationCases } from '../components/sho/StationCases'
 import '../styles/sho-dashboard.css'
+import '../styles/sho-workspace.css'
 import '../styles/sho-shell.css'
 
 const initialCaseTeams = {
